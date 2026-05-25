@@ -1,0 +1,46 @@
+{
+  "name": "nexus-transcripts",
+  "version": "1.0.0",
+  "description": "Next-gen dynamic and interactive HTML transcripts for Discord channels",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc && node build.js",
+    "test": "node dist/test/run.js",
+    "dev": "tsc -w",
+    "start": "node dev-server.js"
+  },
+  "keywords": [
+    "discord",
+    "discord-bot",
+    "transcript",
+    "html",
+    "discord-html-transcripts",
+    "interactive",
+    "ticket-logs"
+  ],
+  "author": "Sejed TRABELSSI (Cortex HQ)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SEJED-DEV/nexus-transcripts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SEJED-DEV/nexus-transcripts/issues"
+  },
+  "homepage": "https://github.com/SEJED-DEV/nexus-transcripts#readme",
+  "license": "MIT",
+  "peerDependencies": {
+    "discord.js": "^14.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}
