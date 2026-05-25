@@ -1,0 +1,5 @@
+node_modules
+dist
+test-transcript.html
+.DS_Store
+*.log
