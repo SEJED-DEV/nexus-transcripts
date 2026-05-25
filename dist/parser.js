@@ -63,7 +63,7 @@ async function parseChannel(channel) {
         name: channel.name || 'unnamed-channel',
         type: channel.type?.toString() || 'GUILD_TEXT',
         guildName: guild.name || 'Unknown Server',
-        guildIconUrl: guild.iconURL ? guild.iconURL({ forceStatic: true, size: 64 }) : null,
+        guildIconUrl: typeof guild.iconURL === 'function' ? guild.iconURL({ forceStatic: true, size: 64 }) : (guild.iconURL || guild.iconUrl || null),
         topic: channel.topic || null
     };
 }
@@ -73,7 +73,7 @@ async function parseMessages(messages, options) {
         const author = msg.author || {};
         const member = msg.member || {};
         // Avatar URL (optionally inlined as base64)
-        let avatarUrl = author.displayAvatarURL ? author.displayAvatarURL({ forceStatic: true, size: 64 }) : '';
+        let avatarUrl = typeof author.displayAvatarURL === 'function' ? author.displayAvatarURL({ forceStatic: true, size: 64 }) : (author.displayAvatarURL || author.avatarURL || author.avatarUrl || '');
         if (options.inlineAvatars && avatarUrl.startsWith('http')) {
             avatarUrl = await fetchBase64(avatarUrl);
         }
@@ -118,7 +118,8 @@ async function parseMessages(messages, options) {
             : (Array.isArray(msg.attachments) ? msg.attachments : []);
         for (const att of rawAttachments) {
             let url = att.url;
-            if (options.inlineImages && att.contentType?.startsWith('image/') && url.startsWith('http')) {
+            if ((options.saveAttachments || (options.inlineImages && att.contentType?.startsWith('image/')))
+                && url.startsWith('http')) {
                 url = await fetchBase64(url);
             }
             attachmentPayloads.push({

@@ -5,6 +5,7 @@ export interface TranscriptOptions {
     poweredBy?: boolean;
     inlineImages?: boolean;
     inlineAvatars?: boolean;
+    saveAttachments?: boolean;
     theme?: 'dark' | 'light' | 'oled' | 'aurora' | 'cyberpunk' | 'sunset' | 'rosegold' | 'forest';
 }
 export interface UserPayload {

@@ -60,6 +60,7 @@
       --reply-bar: rgba(79,70,229,0.5);
       --spoiler-bg: rgba(0,0,0,0.15);
       --blockquote-bar: rgba(79,70,229,0.6);
+      --bot-tag-border: rgba(0,0,0,0.18);
     }
     [data-theme="oled"] {
       --bg: #000000;
@@ -474,6 +475,7 @@
     .bot-tag {
       font-size: 0.58rem; font-weight: 800; padding: 1px 5px; border-radius: 4px;
       background: var(--accent); color: white; text-transform: uppercase; letter-spacing: 0.3px;
+      border: 1px solid var(--bot-tag-border, transparent);
     }
     .app-tag {
       font-size: 0.58rem; font-weight: 800; padding: 1px 5px; border-radius: 4px;
