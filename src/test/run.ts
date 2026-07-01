@@ -245,6 +245,53 @@ async function runTest() {
         { emoji: '🔥', count: 4, me: false },
         { emoji: '😍', count: 3, me: false }
       ]
+    },
+    {
+      id: '9',
+      author: {
+        id: '105',
+        username: 'Nexus Bot v2',
+        discriminator: '8888',
+        displayAvatarURL: () => 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150',
+        bot: true
+      },
+      member: {
+        displayHexColor: '#f59e0b',
+        displayName: 'Nexus v2 Bot'
+      },
+      content: '',
+      createdTimestamp: Date.now() - 300000,
+      pinned: false,
+      embeds: [],
+      attachments: [],
+      reactions: [],
+      containers: [
+        {
+          accentColor: 0xf59e0b,
+          components: [
+            {
+              type: 'text_display',
+              content: '**Welcome to the v2 Container system!**\nThis message uses the new Discord.js v2 `ContainerBuilder` with `TextDisplayBuilder`, `MediaGalleryBuilder`, and `ActionRowBuilder`.\n\n> All rendered statically in the transcript — showing exactly what users saw.'
+            },
+            {
+              type: 'media_gallery',
+              items: [
+                { url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600' },
+                { url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600' }
+              ]
+            },
+            {
+              type: 'action_row',
+              components: [
+                { label: 'Approve', style: 3, emoji: '✅' },
+                { label: 'Deny', style: 4, emoji: '❌' },
+                { label: 'Details', style: 5, url: 'https://example.com' },
+                { placeholder: 'Choose an option', options: [{ label: 'Option A', value: 'a' }, { label: 'Option B', value: 'b' }] }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ];
 

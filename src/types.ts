@@ -77,6 +77,59 @@ export interface MessageReferencePayload {
   guildId?: string;
 }
 
+// V2 Container Component types (Discord.js v14.18+)
+export interface V2ContainerButton {
+  customId?: string;
+  label: string;
+  style: number;
+  emoji?: string;
+  url?: string;
+  disabled?: boolean;
+}
+
+export interface V2ContainerSelectOption {
+  label: string;
+  value: string;
+  description?: string;
+  emoji?: string;
+  default?: boolean;
+}
+
+export interface V2ContainerSelectMenu {
+  customId?: string;
+  placeholder?: string;
+  options: V2ContainerSelectOption[];
+  disabled?: boolean;
+}
+
+export interface V2ContainerTextDisplay {
+  type: 'text_display';
+  content: string;
+}
+
+export interface V2ContainerMediaItem {
+  url: string;
+  description?: string;
+  spoiler?: boolean;
+}
+
+export interface V2ContainerMediaGallery {
+  type: 'media_gallery';
+  items: V2ContainerMediaItem[];
+}
+
+export interface V2ContainerActionRow {
+  type: 'action_row';
+  components: (V2ContainerButton | V2ContainerSelectMenu)[];
+}
+
+export type V2ContainerChild = V2ContainerTextDisplay | V2ContainerMediaGallery | V2ContainerActionRow;
+
+export interface V2Container {
+  accentColor?: number;
+  components: V2ContainerChild[];
+}
+
 export interface MessagePayload {
   id: string;
   author: UserPayload;
@@ -89,6 +142,7 @@ export interface MessagePayload {
   reference?: MessageReferencePayload;
   system?: boolean;
   pinned?: boolean;
+  containers?: V2Container[];
 }
 
 export interface ChannelPayload {

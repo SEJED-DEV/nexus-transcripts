@@ -7,7 +7,16 @@ import {
   EmbedPayload, 
   AttachmentPayload,
   ReactionPayload,
-  MessageReferencePayload
+  MessageReferencePayload,
+  V2Container,
+  V2ContainerChild,
+  V2ContainerTextDisplay,
+  V2ContainerMediaGallery,
+  V2ContainerMediaItem,
+  V2ContainerActionRow,
+  V2ContainerButton,
+  V2ContainerSelectMenu,
+  V2ContainerSelectOption
 } from './types';
 
 // Helper to download an asset and convert it to Base64
@@ -146,6 +155,83 @@ export async function parseMessages(
       };
     }
 
+    // Parse v2 container components (Discord.js v14.18+)
+    let containers: V2Container[] | undefined;
+    if (msg.containers && Array.isArray(msg.containers)) {
+      containers = msg.containers;
+    } else if (msg.components && Array.isArray(msg.components)) {
+      const rawContainers = msg.components.filter((c: any) => {
+        if (c.type === 12) return true;
+        if (c.components && Array.isArray(c.components)) {
+          return c.components.some((child: any) => child.type === 5 || child.type === 6);
+        }
+        return false;
+      });
+      if (rawContainers.length) {
+        containers = rawContainers.map((container: any) => {
+          const children: V2ContainerChild[] = [];
+          const rawChildren = container.components || [];
+          for (const child of rawChildren) {
+            if (child.type === 5 || child.constructor?.name === 'TextDisplayBuilder') {
+              const td: V2ContainerTextDisplay = {
+                type: 'text_display',
+                content: child.content || '',
+              };
+              children.push(td);
+            } else if (child.type === 6 || child.constructor?.name === 'MediaGalleryBuilder') {
+              const rawItems = child.items || [];
+              const items: V2ContainerMediaItem[] = rawItems.map((item: any) => ({
+                url: item.url || '',
+                description: item.description || undefined,
+                spoiler: !!item.spoiler,
+              }));
+              const mg: V2ContainerMediaGallery = { type: 'media_gallery', items };
+              children.push(mg);
+            } else if (child.type === 1 || child.constructor?.name === 'ActionRowBuilder') {
+              const rowComponents: (V2ContainerButton | V2ContainerSelectMenu)[] = [];
+              const rawRowChildren = child.components || [];
+              for (const rc of rawRowChildren) {
+                if (rc.type === 2 || rc.constructor?.name === 'ButtonBuilder') {
+                  const btn: V2ContainerButton = {
+                    customId: rc.customId || undefined,
+                    label: rc.label || '',
+                    style: rc.style ?? 1,
+                    emoji: rc.emoji?.toString() || rc.emoji || undefined,
+                    url: rc.url || undefined,
+                    disabled: !!rc.disabled,
+                  };
+                  rowComponents.push(btn);
+                } else if (rc.type === 3 || rc.type === 5 || rc.type === 6 || rc.type === 7 || rc.type === 8 ||
+                           rc.constructor?.name?.includes('SelectMenuBuilder')) {
+                  const rawOptions = rc.options || [];
+                  const options: V2ContainerSelectOption[] = rawOptions.map((opt: any) => ({
+                    label: opt.label || '',
+                    value: opt.value || '',
+                    description: opt.description || undefined,
+                    emoji: opt.emoji?.toString() || opt.emoji || undefined,
+                    default: !!opt.default,
+                  }));
+                  const sm: V2ContainerSelectMenu = {
+                    customId: rc.customId || undefined,
+                    placeholder: rc.placeholder || undefined,
+                    options,
+                    disabled: !!rc.disabled,
+                  };
+                  rowComponents.push(sm);
+                }
+              }
+              const ar: V2ContainerActionRow = { type: 'action_row', components: rowComponents };
+              children.push(ar);
+            }
+          }
+          return {
+            accentColor: container.accentColor ?? container.accent_color ?? undefined,
+            components: children,
+          } satisfies V2Container;
+        });
+      }
+    }
+
     parsedMessages.push({
       id: msg.id,
       author: userPayload,
@@ -158,6 +244,7 @@ export async function parseMessages(
       reference,
       system: !!msg.system,
       pinned: !!msg.pinned,
+      containers,
     });
   }
 
