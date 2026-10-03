@@ -205,3 +205,47 @@ document.addEventListener('visibilitychange', () => {
 const style = document.createElement('style');
 style.textContent = `.visible { opacity: 1 !important; transform: translateY(0) !important; }`;
 document.head.appendChild(style);
+
+// ===== CHANGELOG POPUP (one time only, forever) =====
+// Bumping the version re-shows the popup to everyone.
+const CHANGELOG_KEY = 'nexus-changelog-seen-v1';
+const overlay = document.getElementById('changelogOverlay');
+
+function openChangelog() {
+  if (!overlay) return;
+  overlay.hidden = false;
+  document.body.style.overflow = 'hidden';
+  document.getElementById('changelogOk')?.focus();
+}
+
+function closeChangelog() {
+  if (!overlay) return;
+  overlay.hidden = true;
+  document.body.style.overflow = '';
+  try { localStorage.setItem(CHANGELOG_KEY, '1'); } catch { /* private mode */ }
+}
+
+if (overlay) {
+  let seen = null;
+  try { seen = localStorage.getItem(CHANGELOG_KEY); } catch { /* private mode */ }
+
+  if (!seen) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', openChangelog, { once: true });
+    } else {
+      openChangelog();
+    }
+  }
+
+  document.getElementById('changelogOk')?.addEventListener('click', closeChangelog);
+  document.getElementById('changelogCloseX')?.addEventListener('click', closeChangelog);
+  document.getElementById('changelogDocs')?.addEventListener('click', closeChangelog);
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeChangelog();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !overlay.hidden) closeChangelog();
+  });
+}

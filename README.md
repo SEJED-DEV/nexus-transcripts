@@ -36,6 +36,21 @@
   - Interactive audio and video attachment players
   - Full Discord Markdown parser: custom spoilers (`||spoiler||` toggles), blockquotes, custom formatting, and styled copyable code blocks
   - Elegant fullscreen image lightbox viewer
+* **😀 Stickers, Custom Emoji & Super Reactions:**
+  - Server and Nitro stickers render inline, with animated PNG/APNG/GIF support
+  - Lottie stickers animate automatically. The animation data is embedded by default (~70 KB per animated sticker) because Discord's sticker CDN sends no CORS headers and so a browser can never read the `.json` on its own
+  - Set `inlineLottie: false` to keep transcripts smaller, in which case each animated sticker gets a **Play** button, plus an "Open raw file" link if it cannot be fetched
+  - Custom emoji are inlined as base64 wherever they appear — message text, embeds, spoilers, reactions, and container components
+  - Super reactions get Discord's authentic multi-colour gradient ring plus a burst marker
+  - Optional click-through popover listing everyone who reacted
+* **💬 Rich Message Components:**
+  - V2 container messages render fully, including text displays, sections, thumbnails, file attachments, separators, and media galleries
+  - Bare top-level action rows (buttons and select menus posted without a container) are rendered too, so bot messages never come out blank
+  - `@user`, `@role`, and `#channel` mentions resolve to real names with role colours applied
+  - Markdown is parsed inside containers, and `#`-style titles (which Discord has no syntax for) are rendered as real headings instead of literal `###`
+* **👀 Discord-style reading:**
+  - Transcripts open pinned to the **newest** message rather than the top, so you land where the conversation ended
+  - Stays pinned as images, avatars and animations load in, but never fights you — scroll up to read history and it leaves you alone
 * **💾 Export Options:**
   - **Download HTML** (fully self-contained offline backup file)
   - **Export JSON** (structured raw data payload)
@@ -182,6 +197,22 @@ main();
 | `fileName` | `string` | `'transcript-[channelName].html'` | Filename used when returning `'attachment'` format |
 | `inlineAvatars` | `boolean` | `false` | If true, downloads and embeds user avatars as base64 |
 | `inlineImages` | `boolean` | `false` | If true, downloads and embeds image attachments as base64 |
+| `includeReactionUsers` | `boolean` | `false` | If true, records who reacted to each message and shows a popover on click |
+| `reactionUserLimit` | `number` | `100` | Maximum reactors recorded per reaction when `includeReactionUsers` is enabled |
+| `resolveMentions` | `boolean` | `true` | If true, resolves `@user`, `@role`, and `#channel` references to real names using already-cached guild data (no extra API calls) |
+| `inlineLottie` | `boolean` | `true` | Embeds Lottie sticker animation data so animated stickers play instantly. Set to false for smaller files that load animations on demand |
+
+> **Note on stickers:** sticker images are linked from Discord's CDN by default. Set `saveAttachments: true` to embed them into the HTML file instead. Custom emoji are *always* inlined, since they are small and would otherwise render as broken images. Lottie animation data is embedded the same way, but the SVG-only player is included whenever a transcript contains a Lottie sticker, so playback needs no extra files.
+> **Note on reaction users:** each reaction with users requires one extra Discord API request, which is why it is opt-in.
+> **Note on mentions:** names are read from `MessageMentions` and the guild/client caches, so this costs no API requests. An ID that cannot be resolved renders as a neutral `@Unknown` rather than a raw snowflake. Members without a role colour (`#000000`) fall back to the default mention styling.
+
+---
+
+## 🗺️ Roadmap
+
+- [x] Stickers, custom emoji, and super reactions
+- [x] Optional reactor lists
+- [ ] **Live transcripts** — transcripts that stay open and update in real time as new messages arrive, instead of being a snapshot taken at load time. Currently the generated page shows a one-time toast pointing here so it is not mistaken for a live view.
 
 ---
 

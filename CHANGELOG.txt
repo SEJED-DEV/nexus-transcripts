@@ -1,0 +1,93 @@
+================================================================================
+NEXUS TRANSCRIPTS - CHANGELOG / ANNOUNCEMENT
+================================================================================
+
+A batch of rendering fixes and Discord-parity improvements just landed.
+
+
+--------------------------------------------------------------------------------
+THE BIG ONE: CHAT IS NO LONGER UPSIDE DOWN
+--------------------------------------------------------------------------------
+
+Transcripts were rendering messages newest-first, so the newest message sat at
+the top and scrolling down took you BACKWARDS in time. Ordering is now
+normalised in a single place, so it is correct no matter how you feed messages
+in - a live channel fetch, an array, or a saved collection.
+
+  - Messages now read oldest -> newest, exactly like Discord
+  - Transcripts open pinned to the newest message
+  - Date dividers run in chronological order
+  - The Analytics timespan and date range are correct now too - the old maths
+    subtracted the two dates in the wrong order, which produced a negative
+    span and pinned the "Timespan" stat to a permanent 1d on every export
+
+
+--------------------------------------------------------------------------------
+AUTO-SCROLL, DISCORD-STYLE
+--------------------------------------------------------------------------------
+
+  - Opens at the newest message
+  - Stays pinned while lazy content arrives and changes height (images,
+    avatars, Lottie animation)
+  - Never fights you - the moment you scroll up to read history, it stops
+  - Scroll-to-top / scroll-to-bottom buttons and the G G / Shift+G shortcuts
+    go through the same logic, so they can't drift out of sync
+
+
+--------------------------------------------------------------------------------
+BOT & COMPONENT SUPPORT
+--------------------------------------------------------------------------------
+
+  - Discord V2 components: Containers, Sections, Thumbnails, Files,
+    Separators, Text Displays and Media Galleries
+  - Correct component type IDs, so v2 messages are no longer silently dropped
+  - Bare top-level ActionRows no longer render as blank messages - they're
+    wrapped in a container automatically
+  - Bot-only channels export cleanly
+
+
+--------------------------------------------------------------------------------
+MENTIONS
+--------------------------------------------------------------------------------
+
+@user, @role and #channel resolve to real names and member colours from the
+cache, with no extra API calls. Unresolvable mentions degrade to a neutral pill
+instead of rendering as raw syntax.
+
+
+--------------------------------------------------------------------------------
+LOTTIE STICKERS NOW ACTUALLY PLAY
+--------------------------------------------------------------------------------
+
+Discord's sticker CDN doesn't send CORS headers, so browsers refuse to read the
+animation data - which is why animated stickers often showed a dead button or
+nothing at all.
+
+  - Animation JSON is embedded directly in the export by default, so stickers
+    animate offline with no network dependency
+  - The Lottie runtime is only embedded when a transcript actually contains an
+    animation, keeping normal exports lean
+  - inlineLottie: false keeps the original remote mode
+  - Failures now degrade to a clear message plus a raw-file link instead of a
+    dead end
+
+
+--------------------------------------------------------------------------------
+MARKDOWN & EMOJI
+--------------------------------------------------------------------------------
+
+  - # through ###### render as headings, with code blocks and inline
+    #hashtags correctly left alone
+  - Fixed [object Object] appearing on component buttons, selects and
+    accessories - custom and Unicode emoji render properly
+  - Buttons without an emoji no longer get an empty glyph placeholder
+
+
+--------------------------------------------------------------------------------
+DOCS & TESTS
+--------------------------------------------------------------------------------
+
+README and the website now cover resolveMentions, inlineLottie, v2 components
+and headings. The offline suite was extended, and everything was verified in a
+real headless Chrome across Lottie runtime, rendering, scroll behaviour and
+message ordering.

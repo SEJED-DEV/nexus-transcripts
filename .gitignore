@@ -1,5 +1,7 @@
 node_modules
 dist
 test-transcript.html
+order-check.html
+opencode-export-*.html
 .DS_Store
 *.log

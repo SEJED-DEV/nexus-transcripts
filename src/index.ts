@@ -1,5 +1,5 @@
 import { TranscriptOptions } from './types';
-import { parseChannel, parseMessages } from './parser';
+import { parseChannel, parseMessages, createEmojiCollector, createMentionCollector } from './parser';
 import { compileTranscript } from './compiler';
 
 /**
@@ -13,12 +13,14 @@ export async function createTranscript(
 ): Promise<string | Buffer | any> {
   const limit = options.limit ?? -1;
   
-  // Fetch messages from Discord.js channel structure if fetch exists
+  // Fetch messages from Discord.js channel structure if fetch exists.
+  // Ordering is normalised inside parseMessages(), so both branches can pass
+  // messages through untouched (Discord returns them newest-first).
   let messagesList: any[] = [];
   if (channel.messages && typeof channel.messages.fetch === 'function') {
     const fetchLimit = limit === -1 ? 100 : Math.min(limit, 100);
     const fetched = await channel.messages.fetch({ limit: fetchLimit });
-    messagesList = Array.from(fetched.values()).reverse();
+    messagesList = Array.from(fetched.values());
   } else if (Array.isArray(channel.messages)) {
     messagesList = channel.messages;
   }
@@ -42,8 +44,18 @@ export async function generateFromMessages(
     : (messages.values ? Array.from(messages.values()) : []);
 
   const parsedChannel = await parseChannel(channel);
-  const parsedMessages = await parseMessages(messageArray, options);
-  const htmlContent = await compileTranscript(parsedChannel, parsedMessages, options);
+  // Shared collectors so every custom emoji is inlined once and every
+  // mention is resolved once across the whole transcript.
+  const emojiCollector = createEmojiCollector();
+  const mentionCollector = createMentionCollector(options);
+  const parsedMessages = await parseMessages(messageArray, options, emojiCollector, mentionCollector);
+  const htmlContent = await compileTranscript(
+    parsedChannel,
+    parsedMessages,
+    options,
+    emojiCollector.emojiMap,
+    mentionCollector.mentionMap
+  );
 
   const returnType = options.returnType || 'string';
 
@@ -66,7 +78,7 @@ export async function generateFromMessages(
 }
 
 export * from './types';
-export { parseChannel, parseMessages } from './parser';
+export { parseChannel, parseMessages, createEmojiCollector, createMentionCollector } from './parser';
 export { compileTranscript } from './compiler';
 export default {
   createTranscript,

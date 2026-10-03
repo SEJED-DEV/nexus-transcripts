@@ -292,6 +292,319 @@ async function runTest() {
           ]
         }
       ]
+    },
+
+    // ---- Stickers as a Collection (Map), matching discord.js ----
+    {
+      id: '10',
+      author: {
+        id: '106',
+        username: 'Stella',
+        discriminator: '6666',
+        displayAvatarURL: () => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+        bot: false
+      },
+      member: {
+        displayHexColor: '#a78bfa',
+        displayName: 'Stella'
+      },
+      content: '',
+      createdTimestamp: Date.now() - 5400000,
+      pinned: false,
+      embeds: [],
+      attachments: [],
+      stickers: new Map([
+        ['1051665016680650823', {
+          id: '1051665016680650823',
+          name: 'Wave Hello',
+          description: 'A friendly wave',
+          format: 1,            // PNG
+          tags: null,
+          available: true,
+          url: 'https://cdn.discordapp.com/stickers/1051665016680650823.png'
+        }],
+        ['1051665016680650824', {
+          id: '1051665016680650824',
+          name: 'Party Blob',
+          description: 'Celebration',
+          format: 3,            // Lottie -> placeholder, no image src
+          tags: null,
+          available: true,
+          url: 'https://cdn.discordapp.com/stickers/1051665016680650824.json'
+        }]
+      ]),
+      reactions: []
+    },
+
+    // ---- Stickers as a plain array, mixed with an embed using custom emoji ----
+    {
+      id: '11',
+      author: {
+        id: '107',
+        username: 'Rex',
+        discriminator: '7777',
+        displayAvatarURL: () => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+        bot: false
+      },
+      member: {
+        displayHexColor: '#38bdf8',
+        displayName: 'Rex'
+      },
+      content: 'Look at this <:nexus:123456789012345678> reaction',
+      createdTimestamp: Date.now() - 3600000,
+      pinned: false,
+      attachments: [],
+      stickers: [
+        {
+          id: '1051665016680650825',
+          name: 'Animated Yippee',
+          description: 'Yippee animation',
+          format: 4,            // GIF
+          tags: null,
+          available: true,
+          url: 'https://cdn.discordapp.com/stickers/1051665016680650825.gif'
+        }
+      ],
+      embeds: [
+        {
+          type: 'rich',
+          title: 'Deploy <a:partyparrot:234567890123456789>',
+          description: 'Build passed with <:nexus:123456789012345678>',
+          color: 0x5865f2,
+          timestamp: new Date(Date.now() - 3500000).toISOString(),
+          footer: { text: 'CI bot' }
+        }
+      ],
+      reactions: []
+    },
+
+    // ---- Emoji inside code must stay literal ----
+    {
+      id: '12',
+      author: {
+        id: '108',
+        username: 'Iris',
+        discriminator: '8888',
+        displayAvatarURL: () => 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150',
+        bot: false
+      },
+      member: {
+        displayHexColor: '#fb7185',
+        displayName: 'Iris'
+      },
+      content: 'Inline `<:nexus:123456789012345678>` stays text\n```\nconst e = "<:nexus:123456789012345678>";\n```\nSpoiler ||<:secret:123456789012345680> hidden|| done',
+      createdTimestamp: Date.now() - 1800000,
+      pinned: false,
+      embeds: [],
+      attachments: [],
+      reactions: []
+    },
+
+    // ---- Super reactions, custom emoji reactions, and reactor lists ----
+    {
+      id: '13',
+      author: {
+        id: '109',
+        username: 'Juno',
+        discriminator: '9999',
+        displayAvatarURL: () => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150',
+        bot: false
+      },
+      member: {
+        displayHexColor: '#facc15',
+        displayName: 'Juno'
+      },
+      content: 'Ship it! <a:partyparrot:234567890123456789>',
+      createdTimestamp: Date.now() - 600000,
+      pinned: false,
+      embeds: [],
+      attachments: [],
+      // Shaped like discord.js: Message#reactions is a ReactionManager, whose
+      // reactions live in `.cache` (it is NOT a Map). Message 1 above covers the
+      // plain-array shape.
+      reactions: {
+        cache: new Map<string, any>([
+          ['<:nexus:123456789012345678>', {
+            emoji: {
+              id: '123456789012345678',
+              name: 'nexus',
+              animated: false,
+              toString() { return '<:nexus:123456789012345678>'; }
+            },
+            count: 6,
+            me: true,
+            meBurst: true,
+            burstColors: ['#ff73fa', '#c9a0ff', '#53f0ff'],
+            countDetails: { burst: 3, normal: 3 },
+            users: {
+              fetch: async () => [
+                { id: '201', username: 'Carol', displayName: 'Carol ✨', displayAvatarURL: () => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', displayHexColor: '#f472b6' },
+                { id: '202', username: 'Dave', displayName: 'Dave', displayAvatarURL: () => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' },
+                { id: '203', username: 'Eve', displayName: 'Eve', displayAvatarURL: () => 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150' }
+              ]
+            }
+          }],
+          ['🎉', {
+            emoji: '🎉',
+            count: 4,
+            countDetails: { burst: 0, normal: 4 },
+            users: {
+              fetch: async () => new Map([
+                ['204', { id: '204', username: 'Frank', displayName: 'Frank', displayAvatarURL: () => 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150' }]
+              ])
+            }
+          }],
+          ['🔥', {
+            emoji: '🔥',
+            count: 2,
+            countDetails: { burst: 0, normal: 2 }
+            // no users.fetch -> no reactor list requested
+          }]
+        ])
+      }
+    },
+
+    // ---- Raw discord.js V2 components (the shape the gateway actually sends).
+    //      Mirrors the "Cortex" auto-responder bot, which posts Containers with
+    //      no content/embeds/attachments at all - if this is mis-parsed the whole
+    //      message renders blank. ----
+    {
+      id: '14',
+      author: {
+        id: '999',
+        username: 'Cortex',
+        discriminator: '0001',
+        displayAvatarURL: () => 'https://cdn.discordapp.com/avatars/1481721720099569848/a_abcdef.png',
+        bot: true
+      },
+      member: {
+        displayHexColor: '#5865f2',
+        displayName: 'Cortex'
+      },
+      content: '',
+      createdTimestamp: Date.now() - 120000,
+      pinned: false,
+      embeds: [],
+      attachments: [],
+      stickers: [],
+      components: [
+        {
+          type: 17, // Container
+          accent_color: 5793266,
+          components: [
+            { type: 10, content: '### 🤖 Advanced Auto Responder' }, // TextDisplay
+            { type: 10, content: '🔹 **discord** (`exact`)\nStatus: 🟢 Active | Text | Cooldown: 3s' },
+            { type: 14, divider: true, spacing: 8 },                  // Separator
+            {
+              type: 9,                                                // Section
+              components: [{ type: 10, content: 'Managed by Cortex <:nexus:123456789012345678>' }],
+              accessory: { type: 11, url: 'https://cdn.discordapp.com/avatars/985444871722631199/a_abcdef.png', description: 'Owner' }
+            },
+            {
+              type: 13,                                              // File
+              file: { url: 'https://cdn.discordapp.com/attachments/1/2/report.txt', name: 'report.txt' },
+              description: 'Generated report'
+            },
+            {
+              type: 1,                                               // ActionRow
+              components: [
+                { type: 2, customId: 'ar_add_init', style: 3, label: 'Add New', emoji: { name: '➕', id: null, animated: false } },
+                { type: 2, customId: 'ar_prev', style: 2, label: 'Prev', disabled: true, emoji: { name: '⏪', id: null, animated: false } },
+                {
+                  type: 3,                                           // StringSelect
+                  customId: 'ar_pick',
+                  placeholder: 'Choose an option',
+                  options: [{ label: 'Option A', value: 'a', description: 'First' }]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    // ---- Loose top-level ActionRows with NO container wrapper (type 17).
+    //      Real bots post these; if only type 17 is handled the message renders
+    //      completely blank because content/embeds/attachments are all empty. ----
+    {
+      id: '16',
+      author: {
+        id: '998',
+        username: 'QueueBot',
+        discriminator: '0002',
+        displayAvatarURL: () => 'https://cdn.discordapp.com/avatars/998/a_abcdef.png',
+        bot: true
+      },
+      member: {
+        displayHexColor: '#1db954',
+        displayName: 'QueueBot'
+      },
+      content: '',
+      createdTimestamp: Date.now() - 60000,
+      pinned: false,
+      embeds: [],
+      attachments: [],
+      stickers: [],
+      components: [
+        {
+          type: 1,
+          components: [
+            { type: 3, customId: 'selectMenu', placeholder: 'Select a filter to apply.', minValues: 1, maxValues: 1 }
+          ]
+        },
+        {
+          type: 1,
+          components: [
+            { type: 2, customId: 'queue_prev', style: 2, label: 'Previous', disabled: true },
+            { type: 2, customId: 'queue_play', style: 1, label: 'Play' },
+            { type: 2, customId: 'queue_next', style: 2, label: 'Next' }
+          ]
+        }
+      ]
+    },
+
+    // ---- Mentions: discord.js pre-parses these onto msg.mentions ----
+    {
+      id: '15',
+      author: {
+        id: '110',
+        username: 'Mika',
+        discriminator: '1212',
+        displayAvatarURL: () => 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150',
+        bot: false
+      },
+      member: {
+        displayHexColor: '#22d3ee',
+        displayName: 'Mika'
+      },
+      content: 'hey <@106> and <@!106>, check <#153456789012345678>, devs <@&153456789012345679> only',
+      createdTimestamp: Date.now() - 90000,
+      pinned: false,
+      embeds: [],
+      attachments: [],
+      stickers: [],
+      mentions: {
+        members: new Map([
+          ['106', {
+            displayName: 'Stella',
+            displayHexColor: '#a78bfa',
+            user: {
+              id: '106',
+              username: 'Stella',
+              discriminator: '6666',
+              bot: false,
+              displayAvatarURL: () => 'https://cdn.discordapp.com/avatars/106/a_abcdef.png'
+            }
+          }]
+        ]),
+        users: new Map(),
+        roles: new Map([
+          ['153456789012345679', { id: '153456789012345679', name: 'Developers', hexColor: '#57f287', position: 3 }]
+        ]),
+        channels: new Map([
+          ['153456789012345678', { id: '153456789012345678', name: 'showcase', type: 0 }]
+        ])
+      }
     }
   ];
 
@@ -302,7 +615,9 @@ async function runTest() {
   }, {
     poweredBy: true,
     fileName: 'test-transcript.html',
-    returnType: 'string'
+    returnType: 'string',
+    includeReactionUsers: true,
+    reactionUserLimit: 10
   });
 
   const outputPath = path.join(process.cwd(), 'test-transcript.html');

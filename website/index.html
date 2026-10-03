@@ -342,6 +342,7 @@ pnpm add nexus-transcripts</pre>
   returnType: <span class="str">'string'</span>,
   inlineAvatars: <span class="kw">true</span>,
   inlineImages: <span class="kw">true</span>,
+  includeReactionUsers: <span class="kw">true</span>,
 });
 
 fs.writeFileSync(<span class="str">'transcript.html'</span>, html);</pre>
@@ -360,6 +361,10 @@ fs.writeFileSync(<span class="str">'transcript.html'</span>, html);</pre>
                   <tr><td><code>fileName</code></td><td><code>string</code></td><td><code>'transcript-[name].html'</code></td><td>Filename when using attachment mode.</td></tr>
                   <tr><td><code>inlineAvatars</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Downloads &amp; embeds avatars as Base64.</td></tr>
                   <tr><td><code>inlineImages</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Downloads &amp; embeds image attachments as Base64.</td></tr>
+                  <tr><td><code>includeReactionUsers</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Records who reacted; click a reaction to see the list.</td></tr>
+                  <tr><td><code>reactionUserLimit</code></td><td><code>number</code></td><td><code>100</code></td><td>Max reactors stored per reaction.</td></tr>
+                  <tr><td><code>resolveMentions</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Resolves <code>@user</code>, <code>@role</code> and <code>#channel</code> to real names. Free — reads cached data.</td></tr>
+                  <tr><td><code>inlineLottie</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Embeds Lottie animation data so animated stickers play instantly. Set <code>false</code> for smaller files with a Play button.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -450,6 +455,69 @@ fs.writeFileSync(<span class="str">'transcript.html'</span>, html);</pre>
       </div>
     </div>
   </footer>
+
+  <!-- ===== CHANGELOG POPUP (shown once per browser) ===== -->
+  <div class="modal-overlay" id="changelogOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="changelogTitle">
+      <div class="modal-head">
+        <div>
+          <span class="modal-eyebrow">Changelog</span>
+          <h2 class="modal-title" id="changelogTitle">Message order &amp; rendering fixes</h2>
+        </div>
+        <button class="modal-x" id="changelogCloseX" type="button" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="chg">
+          <div class="chg-dot chg-dot-fix"></div>
+          <div class="chg-txt">
+            <strong>Chat is no longer upside down</strong>
+            <p>Messages rendered newest-first, so the newest sat at the top. Ordering is now normalised in one place and transcripts read oldest &rarr; newest, just like Discord.</p>
+          </div>
+        </div>
+        <div class="chg">
+          <div class="chg-dot chg-dot-fix"></div>
+          <div class="chg-txt">
+            <strong>Auto-scroll, Discord-style</strong>
+            <p>Opens pinned to the newest message, stays pinned while images and Lottie stickers load, and never fights you once you scroll up to read history.</p>
+          </div>
+        </div>
+        <div class="chg">
+          <div class="chg-dot chg-dot-fix"></div>
+          <div class="chg-txt">
+            <strong>Correct timespan &amp; date dividers</strong>
+            <p>The Analytics timespan subtracted the dates in the wrong order, producing a negative span that pinned it to &ldquo;1d&rdquo; on every export. Both are fixed.</p>
+          </div>
+        </div>
+        <div class="chg">
+          <div class="chg-dot chg-dot-new"></div>
+          <div class="chg-txt">
+            <strong>Lottie stickers actually play</strong>
+            <p>Discord&rsquo;s sticker CDN sends no CORS headers, so browsers refused the animation data. Sticker JSON is now embedded in the export by default and plays offline.</p>
+          </div>
+        </div>
+        <div class="chg">
+          <div class="chg-dot chg-dot-new"></div>
+          <div class="chg-txt">
+            <strong>Bot &amp; component support</strong>
+            <p>Full Discord V2 components (Containers, Sections, Media, Files, Separators), bare ActionRows no longer render blank, and bot-only channels export cleanly.</p>
+          </div>
+        </div>
+        <div class="chg">
+          <div class="chg-dot chg-dot-new"></div>
+          <div class="chg-txt">
+            <strong>Mentions, headings &amp; emoji</strong>
+            <p>@user, @role and #channel resolve to real names and colours. <code>#</code>&ndash;<code>######</code> render as headings, and the <code>[object Object]</code> bug on component buttons is gone.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <a class="btn-ghost" href="#docs" id="changelogDocs">Read the docs</a>
+        <button class="btn-primary" id="changelogOk" type="button">Got it</button>
+      </div>
+    </div>
+  </div>
 
   <div class="toast-container" id="toastContainer"></div>
 
