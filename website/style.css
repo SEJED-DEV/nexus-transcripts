@@ -42,6 +42,7 @@ button { font-family: var(--font); cursor: pointer; }
 
 /* ===== CONTAINER ===== */
 .container {
+  width: 100%;
   max-width: 1180px;
   margin: 0 auto;
   padding: 0 24px;
@@ -58,6 +59,7 @@ button { font-family: var(--font); cursor: pointer; }
   transition: background 0.3s;
 }
 .nav-inner {
+  width: 100%;
   max-width: 1180px;
   margin: 0 auto;
   padding: 0 24px;
@@ -65,6 +67,7 @@ button { font-family: var(--font); cursor: pointer; }
   display: flex;
   align-items: center;
   gap: 24px;
+  min-width: 0;
 }
 .nav-logo {
   display: flex;
@@ -74,6 +77,8 @@ button { font-family: var(--font); cursor: pointer; }
   font-size: 1rem;
   letter-spacing: -0.2px;
   white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
 }
 .nav-logo-icon { font-size: 1.3rem; }
 .nav-links {
@@ -81,6 +86,7 @@ button { font-family: var(--font); cursor: pointer; }
   align-items: center;
   gap: 4px;
   flex: 1;
+  min-width: 0;
 }
 .nav-link {
   padding: 6px 14px;
@@ -155,6 +161,11 @@ button { font-family: var(--font); cursor: pointer; }
 }
 .hero-glow-1 { width: 400px; height: 400px; background: rgba(99,102,241,0.12); top: 10%; left: 50%; transform: translateX(-50%); }
 .hero-glow-2 { width: 250px; height: 250px; background: rgba(168,85,247,0.08); bottom: 20%; right: 10%; }
+/* Keep decorative blur inside narrow viewports instead of forcing page width. */
+@media (max-width: 560px) {
+  .hero-glow-1 { width: 300px; height: 300px; }
+  .hero-glow-2 { width: 180px; height: 180px; }
+}
 .hero .container { position: relative; z-index: 1; text-align: center; }
 .hero-badge {
   display: inline-flex; align-items: center; gap: 8px;
@@ -282,6 +293,10 @@ button { font-family: var(--font); cursor: pointer; }
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 16px;
 }
+@media (max-width: 560px) {
+  /* auto-fit minmax(260px) still overflows below 260px + padding. */
+  .features-grid { grid-template-columns: 1fr; }
+}
 .feature-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -391,18 +406,27 @@ button { font-family: var(--font); cursor: pointer; }
 
 /* ===== DOCS ===== */
 .docs-layout {
+  width: 100%;
   max-width: 800px;
   margin: 0 auto;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
+  /* Without this the tab strip's intrinsic width widens the whole page. */
+  min-width: 0;
+}
+html, body { overflow-x: hidden; }
 }
 .docs-tabs {
   display: flex;
   border-bottom: 1px solid var(--border);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  min-width: 0;
 }
+.docs-tabs::-webkit-scrollbar { display: none; }
 .doc-tab {
   padding: 14px 20px;
   font-size: 0.85rem; font-weight: 700;
@@ -489,8 +513,11 @@ button { font-family: var(--font); cursor: pointer; }
 /* ===== PLAYGROUND ===== */
 .playground-layout {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  /* minmax(0, 1fr) rather than 1fr: a bare 1fr track is floored by its
+     content's intrinsic width, so a wide <pre> would stretch the page. */
+  grid-template-columns: 280px minmax(0, 1fr);
   gap: 20px;
+  width: 100%;
   max-width: 900px;
   margin: 0 auto;
 }
@@ -499,7 +526,11 @@ button { font-family: var(--font); cursor: pointer; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 22px;
+  /* Grid items default to min-width:auto and refuse to shrink below their
+     content, which widens the whole page on narrow screens. */
+  min-width: 0;
 }
+.playground-preview { min-width: 0; }
 .config-title {
   font-size: 0.78rem; font-weight: 800;
   text-transform: uppercase; letter-spacing: 0.8px;
@@ -515,7 +546,8 @@ button { font-family: var(--font); cursor: pointer; }
   font-family: var(--font-mono);
   background: transparent; border: 1px solid var(--border);
   color: var(--text-muted); transition: all 0.15s;
-}
+  white-space: nowrap;
+  }
 .config-opt:hover, .config-opt.active {
   background: var(--accent); color: white; border-color: transparent;
 }
@@ -674,26 +706,38 @@ button { font-family: var(--font); cursor: pointer; }
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   .feature-card--accent { grid-column: span 1; }
-  .playground-layout { grid-template-columns: 1fr; }
+  .playground-layout { grid-template-columns: minmax(0, 1fr); }
   .footer-inner { grid-template-columns: 1fr 1fr; }
   .footer-brand { grid-column: span 2; }
   .modal-head, .modal-body, .modal-foot { padding-left: 18px; padding-right: 18px; }
   .modal-foot { flex-direction: column-reverse; align-items: stretch; }
   .modal-foot .btn-primary, .modal-foot .btn-ghost { justify-content: center; }
 }
-@media (max-width: 700px) {
+@media (max-width: 860px) {
   .nav-links, .nav-cta { display: none; }
   .nav-mobile-btn { display: flex; }
+}
+@media (max-width: 700px) {
   .hero-title { letter-spacing: -0.8px; }
   .hero-stats { gap: 20px; }
   .hero-stat-divider { display: none; }
   .themes-grid { grid-template-columns: repeat(2, 1fr); }
   .footer-inner { grid-template-columns: 1fr; }
   .footer-brand { grid-column: span 1; }
+  .footer-inner { gap: 32px; }
+  .docs-panels { padding: 20px; }
+  .playground-config { padding: 18px; }
 }
 @media (max-width: 420px) {
   .themes-grid { grid-template-columns: 1fr 1fr; }
   .section { padding: 70px 0; }
   .hero-btns { flex-direction: column; align-items: stretch; }
   .btn-hero-primary, .btn-hero-ghost { justify-content: center; }
+  .features-grid { grid-template-columns: 1fr; }
+  .hero-stats { flex-wrap: wrap; justify-content: center; gap: 16px 20px; }
+}
+@media (max-width: 560px) {
+  .section-title { font-size: 1.7rem; }
+  .hero-title { font-size: 2.1rem; }
+  .themes-grid { grid-template-columns: 1fr; }
 }
