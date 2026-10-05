@@ -69,6 +69,41 @@ yarn add nexus-transcripts
 pnpm add nexus-transcripts
 ```
 
+Requires Discord.js `v14` as a peer dependency, and Node.js 18 or newer.
+
+---
+
+## 🩺 Troubleshooting
+
+### "I updated but nothing changed"
+
+The most common cause is a stale lockfile or a leftover `node_modules`. A plain `npm install` will happily keep the version already recorded in your lockfile, so you keep running the old code.
+
+```bash
+rm -rf node_modules package-lock.json
+npm install nexus-transcripts@latest
+```
+
+Confirm you actually got the version you think you did:
+
+```bash
+npm ls nexus-transcripts
+```
+
+### Installing straight from GitHub
+
+```bash
+npm install github:SEJED-DEV/nexus-transcripts
+```
+
+The repository ships its own built output in `dist/`, and a `prepare` hook rebuilds it on install, so a git install gets the same code as the npm release rather than an unbuilt checkout.
+
+### Updating
+
+New transcripts are generated with the code in your installed version, not the version that generated an existing file. If a transcript already on disk looks out of date, regenerate it — re-running the bot is not enough.
+
+Transcripts are self-contained HTML. You can open one from months ago and it will keep working; there is nothing to migrate.
+
 ---
 
 ## 🛠️ Quick Start
@@ -208,6 +243,24 @@ main();
 
 ---
 
+## 📋 What's new in 1.1.0
+
+- **V2 components** — containers, sections, text displays, thumbnails, separators, and media galleries now render fully, and bare action rows no longer produce blank messages
+- **Chronological ordering** — messages are sorted by timestamp in one place, so transcripts are consistently oldest → newest. Versions up to 1.0.1 could emit them reversed depending on which code path ran
+- **Lottie stickers** — animation data is embedded by default with the SVG player bundled, so animated stickers play offline with no extra files
+- **Mentions** — `@user`, `@role`, and `#channel` resolve to real names with role colours, using cached data at no extra API cost
+- **Markdown headings** — `#`-style titles render as real headings instead of literal `###`
+- **Discord-style scrolling** — transcripts open at the newest message and stay pinned as media loads, without fighting you when you scroll up
+
+Upgrading from 1.0.x:
+
+```bash
+rm -rf node_modules package-lock.json
+npm install nexus-transcripts@latest
+```
+
+---
+
 ## 🗺️ Roadmap
 
 - [x] Stickers, custom emoji, and super reactions
@@ -231,6 +284,9 @@ npm install
 # Build files (transpile TS to JS and bundle templates)
 npm run build
 
+# Run the offline renderer test suite
+npm test
+
 # Run local development watcher
 npm run dev
 
@@ -240,6 +296,8 @@ npm start
 ```
 
 Open `http://localhost:3000` to preview your changes live as you code!
+
+`dist/` is committed so that a plain clone is installable, and `prepublishOnly` rebuilds it on every publish. If you change anything under `src/`, run `npm run build` and commit the regenerated `dist/` alongside it.
 
 ## 📄 License & Credits
 
