@@ -1,0 +1,7 @@
+src/
+test-transcript.html
+order-check.html
+opencode-export-*.html
+opencode/
+*.log
+.DS_Store

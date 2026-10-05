@@ -14,7 +14,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.compileTranscript = exports.parseMessages = exports.parseChannel = void 0;
+exports.compileTranscript = exports.createMentionCollector = exports.createEmojiCollector = exports.parseMessages = exports.parseChannel = void 0;
 exports.createTranscript = createTranscript;
 exports.generateFromMessages = generateFromMessages;
 const parser_1 = require("./parser");
@@ -26,12 +26,14 @@ const compiler_1 = require("./compiler");
  */
 async function createTranscript(channel, options = {}) {
     const limit = options.limit ?? -1;
-    // Fetch messages from Discord.js channel structure if fetch exists
+    // Fetch messages from Discord.js channel structure if fetch exists.
+    // Ordering is normalised inside parseMessages(), so both branches can pass
+    // messages through untouched (Discord returns them newest-first).
     let messagesList = [];
     if (channel.messages && typeof channel.messages.fetch === 'function') {
         const fetchLimit = limit === -1 ? 100 : Math.min(limit, 100);
         const fetched = await channel.messages.fetch({ limit: fetchLimit });
-        messagesList = Array.from(fetched.values()).reverse();
+        messagesList = Array.from(fetched.values());
     }
     else if (Array.isArray(channel.messages)) {
         messagesList = channel.messages;
@@ -49,8 +51,12 @@ async function generateFromMessages(messages, channel, options = {}) {
         ? messages
         : (messages.values ? Array.from(messages.values()) : []);
     const parsedChannel = await (0, parser_1.parseChannel)(channel);
-    const parsedMessages = await (0, parser_1.parseMessages)(messageArray, options);
-    const htmlContent = await (0, compiler_1.compileTranscript)(parsedChannel, parsedMessages, options);
+    // Shared collectors so every custom emoji is inlined once and every
+    // mention is resolved once across the whole transcript.
+    const emojiCollector = (0, parser_1.createEmojiCollector)();
+    const mentionCollector = (0, parser_1.createMentionCollector)(options);
+    const parsedMessages = await (0, parser_1.parseMessages)(messageArray, options, emojiCollector, mentionCollector);
+    const htmlContent = await (0, compiler_1.compileTranscript)(parsedChannel, parsedMessages, options, emojiCollector.emojiMap, mentionCollector.mentionMap);
     const returnType = options.returnType || 'string';
     if (returnType === 'buffer') {
         return Buffer.from(htmlContent, 'utf-8');
@@ -71,6 +77,8 @@ __exportStar(require("./types"), exports);
 var parser_2 = require("./parser");
 Object.defineProperty(exports, "parseChannel", { enumerable: true, get: function () { return parser_2.parseChannel; } });
 Object.defineProperty(exports, "parseMessages", { enumerable: true, get: function () { return parser_2.parseMessages; } });
+Object.defineProperty(exports, "createEmojiCollector", { enumerable: true, get: function () { return parser_2.createEmojiCollector; } });
+Object.defineProperty(exports, "createMentionCollector", { enumerable: true, get: function () { return parser_2.createMentionCollector; } });
 var compiler_2 = require("./compiler");
 Object.defineProperty(exports, "compileTranscript", { enumerable: true, get: function () { return compiler_2.compileTranscript; } });
 exports.default = {

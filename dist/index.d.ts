@@ -15,7 +15,7 @@ export declare function generateFromMessages(messages: any[] | {
     values: () => Iterable<any>;
 } | any, channel: any, options?: TranscriptOptions): Promise<string | Buffer | any>;
 export * from './types';
-export { parseChannel, parseMessages } from './parser';
+export { parseChannel, parseMessages, createEmojiCollector, createMentionCollector } from './parser';
 export { compileTranscript } from './compiler';
 declare const _default: {
     createTranscript: typeof createTranscript;
